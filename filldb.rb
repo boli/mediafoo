@@ -53,6 +53,7 @@ begin
 		sth.finish
 	elsif argument == 'scan'
 		tvpaths.each {|path|
+			print "Scanning TV : #{path} : "
 			Find.find(path) do |entry|
 				if File.file?(entry) and entry =~ /.+\.(avi|mpg|mkv|vob|divx|flv|mp4|mpeg|wmv|rmvb|rm)$/
 					sth = dbh.prepare("SELECT * FROM ep_files WHERE path=?")
@@ -67,6 +68,25 @@ begin
 					end
 				end
 			end
+			print "\n"
+		}
+		moviepaths.each {|path|
+			print "Scanning Movie : #{path} : "
+			Find.find(path) do |entry|
+				if File.file?(entry) and entry =~ /.+\.(avi|mpg|mkv|vob|divx|flv|mp4|mpeg|wmv|rmvb|rm)$/
+					sth = dbh.prepare("SELECT * FROM mov_files WHERE path=?")
+					sth.execute(entry)
+					rows = sth.fetch_all.size
+					sth.finish
+					if rows==0
+						sth = dbh.prepare("INSERT INTO mov_files(path,datasource) VALUES (?,'tvdb')")
+						sth.execute(entry)
+						sth.finish
+						print "+"
+					end
+				end
+			end
+			print "\n"
 		}
 	end
 ensure
