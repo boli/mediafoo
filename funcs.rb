@@ -19,9 +19,11 @@ class Randombag
 end
 
 class InfoFromMediaFilename
-	attr_accessor :filename, :basename, :year, :part, :ext
+	attr_accessor :pathname, :filename, :basename, :year, :part, :season, :episode, :ext
 
-	def initialize(filename)
+	def initialize(pathname)
+		@pathname = pathname
+		filename = File.basename(pathname)
 		@filename = filename
 		if filename =~ /.*\((\d\d\d\d)\).*/
 			@year = $1
@@ -39,7 +41,22 @@ class InfoFromMediaFilename
 			@part = $1
 		end
 		@ext = filename[/(?:.*\.)(.*$)/,1]
-		#filename =~ s/\.(\w+)$//
-		#@ext = $1
+		@basename = filename.sub (/\.(\w+)$/,'')
+		@basename = @basename.sub(/ *\(\d\d\d\d\)/,'')
+		@basename = @basename.sub(/ *\[\d\d\d\d\]/,'')
+		@basename = @basename.sub(/ +[a-e]$/i,'')
+		@basename = @basename.sub(/ *part *(\d+|[a-e]).*$/,'')
+		@basename = @basename.sub(/ *cd *\d+.*$/i,'')
+		@basename = @basename.sub(/\./,' ')
+		if @basename =~ /(.*)[Ss](\d+)[Ee](\d+).*$/i
+			@basename = $1
+			@season = $2
+			@episode = $3
+		end
+		if @basename =~ /(.*)(\d+)[Xx](\d+).*$/i
+			@basename = $1
+			@season = $2
+			@episode = $3
+		end
 	end
 end
