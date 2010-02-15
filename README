@@ -1,1 +1,5 @@
-nothing here yet
+mediafoo : a tool for cataloguing media
+
+./filldb.rb - adds/cleans items to/from the library
+
+./grab.rb - tags stuff in the library
